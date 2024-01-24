@@ -31,12 +31,12 @@ public class Task {
         this.name = name;
     }
 
-    public String getStatus() {
-        return status.name();
+    public Status getStatus() {
+        return status;
     }
 
-    public void setStatus(String status) {
-        this.status = Status.valueOf(status);
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     public String getDescription() {

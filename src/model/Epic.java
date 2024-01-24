@@ -10,10 +10,6 @@ public class Epic extends Task {
         super(name, status, description);
     }
 
-    public void setSubTaskId(SubTask subTasks) {
-        this.subTasksId.add(subTasks.getId());
-    }
-
     public ArrayList<Integer> getSubTasksId() {
         return subTasksId;
     }
@@ -43,7 +39,7 @@ public class Epic extends Task {
                 ", name='" + getName() + '\'' +
                 ", status='" + getStatus() + '\'' +
                 ", description='" + getDescription() + '\'' +
-                ", subTasksId='" +  subTasksId.toString() + '\'' +
+                ", subTasksId='" +  subTasksId + '\'' +
                 '}';
     }
 

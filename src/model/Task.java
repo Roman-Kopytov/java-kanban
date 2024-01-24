@@ -1,15 +1,17 @@
 package model;
 
+import java.util.Objects;
+
 public class Task {
-    private int id;
-    private String name;
-    private Status status;
-    private String description;
+    protected int id;
+    protected String name;
+    protected Status status;
+    protected String description;
 
 
-    public Task(String name, String status, String description) {
+    public Task(String name, Status status, String description) {
         this.name = name;
-        this.status = Status.valueOf(status);
+        this.status = status;
         this.description = description;
     }
 
@@ -34,7 +36,7 @@ public class Task {
     }
 
     public void setStatus(String status) {
-        this.status =Status.valueOf(status) ;
+        this.status = Status.valueOf(status);
     }
 
     public String getDescription() {
@@ -54,4 +56,29 @@ public class Task {
                 ", description='" + description + '\'' +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Task task = (Task) o;
+        return id == task.id && Objects.equals(name, task.name) && status == task.status && Objects.equals(description, task.description);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 17;
+        if (name != null) {
+            hash = name.hashCode();
+        }
+        hash = hash * 31;
+        if (status != null) {
+            hash = hash + status.hashCode();
+        }
+        if (description != null) {
+            hash = hash + description.hashCode();
+        }
+        return hash;
+    }
 }
+

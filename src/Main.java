@@ -2,14 +2,17 @@ import model.Epic;
 import model.Status;
 import model.SubTask;
 import model.Task;
+import service.HistoryManager;
+import service.InMemoryHistoryManager;
 import service.InMemoryTaskManager;
 import service.TaskManager;
 
 public class Main {
 
     public static void main(String[] args) {
+        HistoryManager historyManager = new InMemoryHistoryManager();
+        TaskManager manager = new InMemoryTaskManager(historyManager);
 
-        TaskManager manager = new InMemoryTaskManager();
         Task tripdNew = manager.createTask(new Task("Переезд", Status.NEW, "Нужно переехать в Сосновый бор"));
         Task sochiNew = manager.createTask(new Task("Поездка в сочи", Status.NEW, "Нужно собрать вещи"));
 

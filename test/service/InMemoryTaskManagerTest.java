@@ -12,9 +12,11 @@ class InMemoryTaskManagerTest {
 
     @Test
     void addNewTask() {
-        InMemoryTaskManager taskManager = new InMemoryTaskManager();
+        HistoryManager historyManager = new InMemoryHistoryManager();
+        InMemoryTaskManager taskManager = new InMemoryTaskManager(historyManager);
         Task task = new Task("Test addNewTask", Status.NEW , "Test addNewTask description");
-        final int taskId = taskManager.createTask(task).getId();
+        taskManager.createTask(task);
+        final int taskId = task.getId();
 
         final Task savedTask = taskManager.getTask(taskId);
 

@@ -15,6 +15,21 @@ public class Task {
         this.description = description;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Task task = (Task) o;
+
+        return id == task.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return id;
+    }
+
     public int getId() {
         return id;
     }
@@ -57,28 +72,5 @@ public class Task {
                 '}';
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Task task = (Task) o;
-        return id == task.id && Objects.equals(name, task.name) && status == task.status && Objects.equals(description, task.description);
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 17;
-        if (name != null) {
-            hash = name.hashCode();
-        }
-        hash = hash * 31;
-        if (status != null) {
-            hash = hash + status.hashCode();
-        }
-        if (description != null) {
-            hash = hash + description.hashCode();
-        }
-        return hash;
-    }
 }
 

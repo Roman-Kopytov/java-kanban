@@ -5,6 +5,7 @@ import model.Status;
 import model.SubTask;
 import model.Task;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@DisplayName("Менеджер задач")
 class InMemoryTaskManagerTest {
 
     private static HistoryManager historyManager;
@@ -24,7 +26,8 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void addNewTask() {
+    @DisplayName("Должен добавлять задачу")
+    void shouldAddNewTask() {
 
         Task task = new Task("Test addNewTask", Status.NEW, "Test addNewTask description");
         taskManager.createTask(task);
@@ -43,6 +46,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
+    @DisplayName("Должен удалять все задачи")
     public void shouldDeleteAllTask() {
         Task taskFirst = new Task("Test addNewTask", Status.NEW, "Test addNewTask description");
         Task taskSecond = new Task("Test addNewTask", Status.NEW, "Test addNewTask description");
@@ -56,6 +60,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
+    @DisplayName("Должен обновлять задачу")
     public void shouldUpdateTask() {
         Task task = new Task("Test addNewTask", Status.NEW, "Test addNewTask description");
         taskManager.createTask(task);
@@ -68,6 +73,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
+    @DisplayName("Должен добавлять задачу")
     public void shouldDeleteTask() {
         Task task = new Task("Test addNewTask", Status.NEW, "Test addNewTask description");
         taskManager.createTask(task);
@@ -77,6 +83,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
+    @DisplayName("Должен создавать эпик")
     public void shouldCreateEpic() {
         Epic epic = new Epic("Test addNewEpic", Status.NEW, "Test addNewEpic description");
         taskManager.createEpic(epic);
@@ -86,6 +93,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
+    @DisplayName("Должен удалять эпик")
     public void shouldDeleteEpic() {
         Epic epic = new Epic("Test addNewEpic", Status.NEW, "Test addNewEpic description");
         taskManager.createEpic(epic);
@@ -95,6 +103,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
+    @DisplayName("Должен удалять все эпики")
     public void shouldDeleteAllEpic() {
         Epic epicFirst = new Epic("Test addNewEpic", Status.NEW, "Test addNewEpic description");
         Epic epicSecond = new Epic("Test addNewEpic", Status.NEW, "Test addNewEpic description");
@@ -108,6 +117,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
+    @DisplayName("Должен возвращать все эпики")
     public void shouldGetAllEPics() {
         Epic epic = new Epic("Test addNewEpic", Status.NEW, "Test addNewEpic description");
         taskManager.createEpic(epic);
@@ -126,6 +136,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
+    @DisplayName("Должен обновлять эпик")
     public void shouldUpdateEpic() {
         Epic epic = new Epic("Test addNewEpic", Status.NEW, "Test addNewEpic description");
         taskManager.createEpic(epic);
@@ -138,6 +149,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
+    @DisplayName("Должен создавать подзадачу")
     public void shouldCreateSubTask() {
         Epic epic = new Epic("Test addNewEpic", Status.NEW, "Test addNewEpic description");
         taskManager.createEpic(epic);
@@ -163,6 +175,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
+    @DisplayName("Должен возвращать все подзадачи")
     public void shouldGetAllSubTask() {
         Epic epic = new Epic("Test addNewEpic", Status.NEW, "Test addNewEpic description");
         taskManager.createEpic(epic);
@@ -179,22 +192,34 @@ class InMemoryTaskManagerTest {
         List<SubTask> actualSubTasks = taskManager.getAllSubTask();
         assertEquals(expectedSubTasks, actualSubTasks, "Должны совпадать");
 
+
+    }
+
+    @Test
+    @DisplayName("Должен удалять все подзадачи")
+    public void shouldDeleteAllSubTask() {
+        Epic epic = new Epic("Test addNewEpic", Status.NEW, "Test addNewEpic description");
+        taskManager.createEpic(epic);
+        final int epicId = epic.getId();
+        SubTask subTaskFirst = new SubTask("Test NewSubTask1", Status.NEW, "Test NewSubtask description", epic);
+        SubTask subTaskSecond = new SubTask("Test NewSubTask2", Status.NEW, "Test NewSubtask description", epic);
+        taskManager.createSubTask(subTaskFirst);
+        taskManager.createSubTask(subTaskSecond);
+        final int subTaskFirstId = subTaskFirst.getId();
+        final int subTaskSecondId = subTaskSecond.getId();
         taskManager.deleteAllSubTask();
         assertEquals(null,taskManager.getSubTask(subTaskFirstId));
         assertEquals(null,taskManager.getSubTask(subTaskSecondId));
-    }
-
-    @Test
-    public void shouldDeleteAllSubTask() {
 
     }
 
     @Test
+    @DisplayName("Должен возвращать список обращений к задачам")
     public void shouldGetHistory() {
         Epic epicFirst = new Epic("Test addNewEpic", Status.NEW, "Test addNewEpic description");
         Epic epicSecond = new Epic("Test addNewEpic", Status.NEW, "Test addNewEpic description");
-        taskManager.createTask(epicFirst);
-        taskManager.createTask(epicSecond);
+        taskManager.createEpic(epicFirst);
+        taskManager.createEpic(epicSecond);
         final int epicIdFirst = epicFirst.getId();
         final int epicIdSecond = epicSecond.getId();
         taskManager.getEpic(epicIdFirst);

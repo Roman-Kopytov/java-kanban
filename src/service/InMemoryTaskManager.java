@@ -14,7 +14,7 @@ public class InMemoryTaskManager implements TaskManager {
     private final HashMap<Integer, Task> tasks = new HashMap<>();
     private final HashMap<Integer, Epic> epics = new HashMap<>();
     private final HashMap<Integer, SubTask> subTasks = new HashMap<>();
-    HistoryManager defaultHistory;
+    private final HistoryManager defaultHistory;
 
     int seq = 0;
 
@@ -96,8 +96,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Epic getEpic(int id) {
-        defaultHistory.add(tasks.get(id));
-        return epics.get(id);
+        Epic epic = epics.get(id);
+        defaultHistory.add(epic);
+        return epic;
     }
 
     @Override

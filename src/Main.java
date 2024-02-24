@@ -48,6 +48,13 @@ public class Main {
         System.out.println();
         System.out.println(manager.getAllTask());
 
+        manager.getTask(1);
+        manager.getTask(2);
+        System.out.println(historyManager.getHistory());
+        manager.getTask(1);
+        manager.getTask(2);
+        manager.getEpic(3);
+        System.out.println(historyManager.getHistory());
         manager.deleteEpic(3);
         manager.deleteTask(1);
         System.out.println("Удалили epic 3 и task 1");

@@ -73,13 +73,13 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    @DisplayName("Должен добавлять задачу")
+    @DisplayName("Должен удалять задачу")
     public void shouldDeleteTask() {
         Task task = new Task("Test addNewTask", Status.NEW, "Test addNewTask description");
         taskManager.createTask(task);
         final int taskId = task.getId();
         taskManager.deleteTask(taskId);
-        assertEquals(null, taskManager.getTask(taskId), "Должны быть равны");
+        assertNull(taskManager.getTask(taskId), "Должны быть равны");
     }
 
     @Test
@@ -99,7 +99,7 @@ class InMemoryTaskManagerTest {
         taskManager.createEpic(epic);
         final int epicId = epic.getId();
         taskManager.deleteEpic(epicId);
-        assertEquals(null, taskManager.getTask(epicId), "Должны быть равны");
+        assertNull(taskManager.getTask(epicId), "Должны быть равны");
     }
 
     @Test
@@ -171,7 +171,7 @@ class InMemoryTaskManagerTest {
         assertEquals(subTask, taskManager.getSubTask(subTaskId), "Должны совпадать");
 
         taskManager.deleteSubTask(subTaskId);
-        assertEquals(null, taskManager.getEpic(subTaskId), "Должен быть пустой");
+        assertNull(taskManager.getEpic(subTaskId), "Должен быть пустой");
     }
 
     @Test
@@ -208,8 +208,8 @@ class InMemoryTaskManagerTest {
         final int subTaskFirstId = subTaskFirst.getId();
         final int subTaskSecondId = subTaskSecond.getId();
         taskManager.deleteAllSubTask();
-        assertEquals(null,taskManager.getSubTask(subTaskFirstId));
-        assertEquals(null,taskManager.getSubTask(subTaskSecondId));
+        assertNull(taskManager.getSubTask(subTaskFirstId));
+        assertNull(taskManager.getSubTask(subTaskSecondId));
 
     }
 
@@ -228,8 +228,6 @@ class InMemoryTaskManagerTest {
         taskManager.getEpic(epicIdFirst);
         List<Task> historyList = taskManager.getHistory();
         List<Task> expectedList = new ArrayList<>();
-        expectedList.add(epicFirst);
-        expectedList.add(epicSecond);
         expectedList.add(epicSecond);
         expectedList.add(epicFirst);
         assertEquals(expectedList, historyList, "Должны совпадать");

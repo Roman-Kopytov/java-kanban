@@ -120,7 +120,6 @@ public class InMemoryTaskManager implements TaskManager {
                 epicSubTasks.add(subTasks.get(id));
             }
         }
-        defaultHistory.add(subTasks.get(epicId));
         return epicSubTasks;
     }
 
@@ -157,7 +156,7 @@ public class InMemoryTaskManager implements TaskManager {
         Epic savedEpic = epics.get(savedSubTask.getEpicId());
         savedEpic.getSubTasksId().remove(Integer.valueOf(id));
         subTasks.remove(id);
-
+        defaultHistory.remove(id);
         calculateEpicStatus(savedEpic);
     }
 

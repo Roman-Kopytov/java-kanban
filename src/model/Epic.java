@@ -22,7 +22,7 @@ public class Epic extends Task {
         return result;
     }
 
-    private ArrayList<Integer> subTasksId = new ArrayList<>();
+    private final ArrayList<Integer> subTasksId = new ArrayList<>();
 
     public Epic(String name, Status status, String description) {
         super(name, status, description);
@@ -32,7 +32,7 @@ public class Epic extends Task {
         return subTasksId;
     }
 
-    public void deleteSubTasksId(){
+    public void deleteSubTasksId() {
         subTasksId.clear();
     }
 

@@ -42,7 +42,7 @@ class InMemoryTaskManagerTest {
 
         assertNotNull(tasks, "Задачи не возвращаются.");
         assertEquals(1, tasks.size(), "Неверное количество задач.");
-        assertEquals(task, tasks.get(0), "Задачи не совпадают.");
+        assertEquals(task, tasks.getFirst(), "Задачи не совпадают.");
     }
 
     @Test
@@ -73,13 +73,13 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    @DisplayName("Должен добавлять задачу")
+    @DisplayName("Должен удалять задачу")
     public void shouldDeleteTask() {
         Task task = new Task("Test addNewTask", Status.NEW, "Test addNewTask description");
         taskManager.createTask(task);
         final int taskId = task.getId();
         taskManager.deleteTask(taskId);
-        assertEquals(null, taskManager.getTask(taskId), "Должны быть равны");
+        assertNull(taskManager.getTask(taskId), "Должны быть равны");
     }
 
     @Test
@@ -99,7 +99,7 @@ class InMemoryTaskManagerTest {
         taskManager.createEpic(epic);
         final int epicId = epic.getId();
         taskManager.deleteEpic(epicId);
-        assertEquals(null, taskManager.getTask(epicId), "Должны быть равны");
+        assertNull(taskManager.getTask(epicId), "Должны быть равны");
     }
 
     @Test
@@ -132,7 +132,7 @@ class InMemoryTaskManagerTest {
 
         assertNotNull(tasks, "Эпики не возвращаются.");
         assertEquals(1, tasks.size(), "Неверное количество эпиков.");
-        assertEquals(epic, tasks.get(0), "Эпики не совпадают.");
+        assertEquals(epic, tasks.getFirst(), "Эпики не совпадают.");
     }
 
     @Test
@@ -158,7 +158,7 @@ class InMemoryTaskManagerTest {
         taskManager.createSubTask(subTask);
         final int subTaskId = subTask.getId();
         List<SubTask> savedSubTaskList = taskManager.getEpicSubTasks(epicId);
-        assertEquals(subTask, savedSubTaskList.get(0), "Должны совпадать");
+        assertEquals(subTask, savedSubTaskList.getFirst(), "Должны совпадать");
 
         SubTask savedSubTask = taskManager.getSubTask(subTaskId);
         assertEquals(subTask, savedSubTask, "Должны совпадать");
@@ -171,7 +171,7 @@ class InMemoryTaskManagerTest {
         assertEquals(subTask, taskManager.getSubTask(subTaskId), "Должны совпадать");
 
         taskManager.deleteSubTask(subTaskId);
-        assertEquals(null, taskManager.getEpic(subTaskId), "Должен быть пустой");
+        assertNull(taskManager.getEpic(subTaskId), "Должен быть пустой");
     }
 
     @Test
@@ -179,13 +179,10 @@ class InMemoryTaskManagerTest {
     public void shouldGetAllSubTask() {
         Epic epic = new Epic("Test addNewEpic", Status.NEW, "Test addNewEpic description");
         taskManager.createEpic(epic);
-        final int epicId = epic.getId();
         SubTask subTaskFirst = new SubTask("Test NewSubTask1", Status.NEW, "Test NewSubtask description", epic);
         SubTask subTaskSecond = new SubTask("Test NewSubTask2", Status.NEW, "Test NewSubtask description", epic);
         taskManager.createSubTask(subTaskFirst);
         taskManager.createSubTask(subTaskSecond);
-        final int subTaskFirstId = subTaskFirst.getId();
-        final int subTaskSecondId = subTaskSecond.getId();
         List<SubTask> expectedSubTasks = new ArrayList<>();
         expectedSubTasks.add(subTaskFirst);
         expectedSubTasks.add(subTaskSecond);
@@ -200,7 +197,6 @@ class InMemoryTaskManagerTest {
     public void shouldDeleteAllSubTask() {
         Epic epic = new Epic("Test addNewEpic", Status.NEW, "Test addNewEpic description");
         taskManager.createEpic(epic);
-        final int epicId = epic.getId();
         SubTask subTaskFirst = new SubTask("Test NewSubTask1", Status.NEW, "Test NewSubtask description", epic);
         SubTask subTaskSecond = new SubTask("Test NewSubTask2", Status.NEW, "Test NewSubtask description", epic);
         taskManager.createSubTask(subTaskFirst);
@@ -208,8 +204,8 @@ class InMemoryTaskManagerTest {
         final int subTaskFirstId = subTaskFirst.getId();
         final int subTaskSecondId = subTaskSecond.getId();
         taskManager.deleteAllSubTask();
-        assertEquals(null,taskManager.getSubTask(subTaskFirstId));
-        assertEquals(null,taskManager.getSubTask(subTaskSecondId));
+        assertNull(taskManager.getSubTask(subTaskFirstId));
+        assertNull(taskManager.getSubTask(subTaskSecondId));
 
     }
 
@@ -228,11 +224,25 @@ class InMemoryTaskManagerTest {
         taskManager.getEpic(epicIdFirst);
         List<Task> historyList = taskManager.getHistory();
         List<Task> expectedList = new ArrayList<>();
-        expectedList.add(epicFirst);
-        expectedList.add(epicSecond);
         expectedList.add(epicSecond);
         expectedList.add(epicFirst);
         assertEquals(expectedList, historyList, "Должны совпадать");
     }
 
+    @Test
+    @DisplayName("Эпик не должен хранить неактуальные подзадачи")
+    public void shouldDeleteSubtaskFromEpic() {
+        Epic epic = new Epic("Test addNewEpic", Status.NEW, "Test addNewEpic description");
+        taskManager.createEpic(epic);
+        final int epicId = epic.getId();
+        SubTask subTaskFirst = new SubTask("Test NewSubTask1", Status.NEW, "Test NewSubtask description", epic);
+        SubTask subTaskSecond = new SubTask("Test NewSubTask2", Status.NEW, "Test NewSubtask description", epic);
+        taskManager.createSubTask(subTaskFirst);
+        taskManager.createSubTask(subTaskSecond);
+        final int subTaskFirstId = subTaskFirst.getId();
+        taskManager.deleteSubTask(subTaskFirstId);
+        List<Task> expectedList = new ArrayList<>();
+        expectedList.add(subTaskSecond);
+        assertEquals(expectedList, taskManager.getEpicSubTasks(epicId), "Списки должны совпадать");
+    }
 }

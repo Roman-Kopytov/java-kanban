@@ -35,6 +35,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteAllTask() {
+        for (Integer id : tasks.keySet()) {
+            defaultHistory.remove(id);
+        }
         tasks.clear();
     }
 
@@ -49,6 +52,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteTask(int id) {
         tasks.remove(id);
+        defaultHistory.remove(id);
     }
 
     @Override
@@ -78,13 +82,21 @@ public class InMemoryTaskManager implements TaskManager {
         if (savedEpic != null) {
             for (Integer subTaskId : savedEpic.getSubTasksId()) {
                 subTasks.remove(subTaskId);
+                defaultHistory.remove(subTaskId);
             }
             epics.remove(id);
+            defaultHistory.remove(id);
         }
     }
 
     @Override
     public void deleteAllEpic() {
+        for (Epic epic : epics.values()) {
+            defaultHistory.remove(epic.getId());
+            for (Integer subTaskId : epic.getSubTasksId()) {
+                defaultHistory.remove(subTaskId);
+            }
+        }
         subTasks.clear();
         epics.clear();
     }
@@ -120,7 +132,6 @@ public class InMemoryTaskManager implements TaskManager {
                 epicSubTasks.add(subTasks.get(id));
             }
         }
-        defaultHistory.add(subTasks.get(epicId));
         return epicSubTasks;
     }
 
@@ -133,6 +144,9 @@ public class InMemoryTaskManager implements TaskManager {
     public void deleteAllSubTask() {
         subTasks.clear();
         for (Epic epic : epics.values()) {
+            for (Integer subTaskId : epic.getSubTasksId()) {
+                defaultHistory.remove(subTaskId);
+            }
             epic.deleteSubTasksId();
             calculateEpicStatus(epic);
         }
@@ -157,7 +171,7 @@ public class InMemoryTaskManager implements TaskManager {
         Epic savedEpic = epics.get(savedSubTask.getEpicId());
         savedEpic.getSubTasksId().remove(Integer.valueOf(id));
         subTasks.remove(id);
-
+        defaultHistory.remove(id);
         calculateEpicStatus(savedEpic);
     }
 

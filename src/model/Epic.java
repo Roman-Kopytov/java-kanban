@@ -4,6 +4,12 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class Epic extends Task {
+    private final ArrayList<Integer> subTasksId = new ArrayList<>();
+
+    public Epic(String name, Status status, String description) {
+        super(name, status, description);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -22,12 +28,6 @@ public class Epic extends Task {
         return result;
     }
 
-    private final ArrayList<Integer> subTasksId = new ArrayList<>();
-
-    public Epic(String name, Status status, String description) {
-        super(name, status, description);
-    }
-
     public ArrayList<Integer> getSubTasksId() {
         return subTasksId;
     }
@@ -37,13 +37,18 @@ public class Epic extends Task {
     }
 
     @Override
+    public TaskType getType() {
+        return TaskType.EPIC;
+    }
+
+    @Override
     public String toString() {
         return "Epic{" +
                 "id=" + getId() +
                 ", name='" + getName() + '\'' +
                 ", status='" + getStatus() + '\'' +
                 ", description='" + getDescription() + '\'' +
-                ", subTasksId='" +  subTasksId + '\'' +
+                ", subTasksId='" + subTasksId + '\'' +
                 '}';
     }
 

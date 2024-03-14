@@ -8,14 +8,14 @@ import model.Task;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class InMemoryTaskManager implements TaskManager {
 
+    protected final HistoryManager defaultHistory;
     private final HashMap<Integer, Task> tasks = new HashMap<>();
     private final HashMap<Integer, Epic> epics = new HashMap<>();
     private final HashMap<Integer, SubTask> subTasks = new HashMap<>();
-    private final HistoryManager defaultHistory;
-
     int seq = 0;
 
     public InMemoryTaskManager(HistoryManager defaultHistory) {
@@ -126,7 +126,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public List<SubTask> getEpicSubTasks(int epicId) {
         List<SubTask> epicSubTasks = new ArrayList<>();
-        Epic savedEpic = epics.get(epicId);  // реализовал не через containsKey, так как мы потом используем полученное значение
+        Epic savedEpic = epics.get(epicId);
         if (savedEpic != null) {
             for (int id : savedEpic.getSubTasksId()) {
                 epicSubTasks.add(subTasks.get(id));
@@ -202,6 +202,29 @@ public class InMemoryTaskManager implements TaskManager {
         return defaultHistory.getHistory();
     }
 
+    public Map<Integer, Task> getTaskForFile() {
+        return new HashMap<>(tasks);
+    }
+
+    public Map<Integer, SubTask> getSubTaskForFile() {
+        return new HashMap<>(subTasks);
+    }
+
+    public Map<Integer, Epic> getEpicForFile() {
+        return new HashMap<>(epics);
+    }
+
+    protected void setTasks(Integer id, Task task) {
+        tasks.put(id, task);
+    }
+
+    protected <T extends Task> void setEpics(Integer id, T epic) {
+        epics.put(id, (Epic) epic);
+    }
+
+    protected <T extends Task> void setSubTasks(Integer id, T subTusk) {
+        subTasks.put(id, (SubTask) subTusk);
+    }
 
     private void calculateEpicStatus(Epic epic) {
         ArrayList<Integer> savedSubTaskId = epic.getSubTasksId();
@@ -229,4 +252,6 @@ public class InMemoryTaskManager implements TaskManager {
             epic.setStatus(Status.DONE);
         }
     }
+
+
 }

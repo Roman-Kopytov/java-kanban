@@ -43,20 +43,22 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     private void historyFromString(String value) {
-        String[] historyArray = value.split(",");
-        for (String idStr : historyArray) {
-            int id = Integer.parseInt(idStr);
-            Task savedTask = tasks.get(id);
-            Epic savedEpic = epics.get(id);
-            SubTask savedSubTask = subTasks.get(id);
-            if (savedEpic != null) {
-                defaultHistory.add(savedEpic);
-            }
-            if (savedTask != null) {
-                defaultHistory.add(savedTask);
-            }
-            if (savedSubTask != null) {
-                defaultHistory.add(savedSubTask);
+        if (value != null) {
+            String[] historyArray = value.split(",");
+            for (String idStr : historyArray) {
+                int id = Integer.parseInt(idStr);
+                Task savedTask = tasks.get(id);
+                Epic savedEpic = epics.get(id);
+                SubTask savedSubTask = subTasks.get(id);
+                if (savedEpic != null) {
+                    defaultHistory.add(savedEpic);
+                }
+                if (savedTask != null) {
+                    defaultHistory.add(savedTask);
+                }
+                if (savedSubTask != null) {
+                    defaultHistory.add(savedSubTask);
+                }
             }
         }
     }
@@ -70,7 +72,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return stringHistory.toString();
     }
 
-    private static FileBackedTaskManager loadFromFile(File file) {
+    public static FileBackedTaskManager loadFromFile(File file) {
         FileBackedTaskManager manager = new FileBackedTaskManager(file);
         manager.loadFromFile();
         return manager;
@@ -292,7 +294,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         savedEpic.getSubTasksId().add(subTask.getId());
     }
 
-    private void loadFromFile() {
+    public void loadFromFile() {
         try {
             final String s = Files.readString(file.toPath());
             s.split("\n");

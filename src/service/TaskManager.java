@@ -3,6 +3,7 @@ package service;
 import model.Epic;
 import model.SubTask;
 import model.Task;
+
 import java.util.List;
 
 public interface TaskManager {
@@ -11,13 +12,13 @@ public interface TaskManager {
 
     void deleteAllTask();
 
-    void updateTask(model.Task task);
+    void updateTask(Task task);
 
     void deleteTask(int id);
 
-   Task createTask(model.Task task);
+    Task createTask(Task task);
 
-   Task getTask(int id);
+    Task getTask(int id);
 
     void deleteEpic(int id);
 

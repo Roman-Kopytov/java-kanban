@@ -4,6 +4,17 @@ package model;
 public class SubTask extends Task {
     private final int epicId;
 
+    public SubTask(String name, Status status, String description, Epic epic) {
+        super(name, status, description);
+        this.epicId = epic.getId();
+    }
+
+    public SubTask(String name, Status status, String description, Integer id) {
+        super(name, status, description);
+        this.epicId = id;
+
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -22,16 +33,14 @@ public class SubTask extends Task {
         return result;
     }
 
-    public SubTask(String name, Status status, String description, Epic epic) {
-        super(name, status, description);
-        this.epicId = epic.getId();
-
-    }
-
     public int getEpicId() {
         return epicId;
     }
 
+    @Override
+    public TaskType getType() {
+        return TaskType.SUB_TASK;
+    }
 
     @Override
     public String toString() {

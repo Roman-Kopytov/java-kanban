@@ -11,12 +11,11 @@ import java.util.List;
 
 public class InMemoryTaskManager implements TaskManager {
 
-    private final HashMap<Integer, Task> tasks = new HashMap<>();
-    private final HashMap<Integer, Epic> epics = new HashMap<>();
-    private final HashMap<Integer, SubTask> subTasks = new HashMap<>();
-    private final HistoryManager defaultHistory;
-
-    int seq = 0;
+    protected final HistoryManager defaultHistory;
+    protected final HashMap<Integer, Task> tasks = new HashMap<>();
+    protected final HashMap<Integer, Epic> epics = new HashMap<>();
+    protected final HashMap<Integer, SubTask> subTasks = new HashMap<>();
+    protected int seq = 0;
 
     public InMemoryTaskManager(HistoryManager defaultHistory) {
         this.defaultHistory = defaultHistory;
@@ -126,7 +125,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public List<SubTask> getEpicSubTasks(int epicId) {
         List<SubTask> epicSubTasks = new ArrayList<>();
-        Epic savedEpic = epics.get(epicId);  // реализовал не через containsKey, так как мы потом используем полученное значение
+        Epic savedEpic = epics.get(epicId);
         if (savedEpic != null) {
             for (int id : savedEpic.getSubTasksId()) {
                 epicSubTasks.add(subTasks.get(id));
@@ -202,7 +201,6 @@ public class InMemoryTaskManager implements TaskManager {
         return defaultHistory.getHistory();
     }
 
-
     private void calculateEpicStatus(Epic epic) {
         ArrayList<Integer> savedSubTaskId = epic.getSubTasksId();
         int counterDoneStatus = 0;
@@ -229,4 +227,6 @@ public class InMemoryTaskManager implements TaskManager {
             epic.setStatus(Status.DONE);
         }
     }
+
+
 }

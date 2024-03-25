@@ -1,14 +1,18 @@
 package model;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Objects;
 
+@SuppressWarnings("checkstyle:Regexp")
 public class Epic extends Task {
     private final ArrayList<Integer> subTasksId = new ArrayList<>();
+    private LocalDateTime endTime;
 
     public Epic(String name, Status status, String description) {
         super(name, status, description);
     }
+
 
     @Override
     public boolean equals(Object o) {
@@ -28,6 +32,10 @@ public class Epic extends Task {
         return result;
     }
 
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
     public ArrayList<Integer> getSubTasksId() {
         return subTasksId;
     }
@@ -39,6 +47,11 @@ public class Epic extends Task {
     @Override
     public TaskType getType() {
         return TaskType.EPIC;
+    }
+
+    @Override
+    public LocalDateTime getEndTime() {
+        return endTime;
     }
 
     @Override

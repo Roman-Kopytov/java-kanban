@@ -5,6 +5,8 @@ import model.Status;
 import model.SubTask;
 import model.Task;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -147,6 +149,7 @@ public class InMemoryTaskManager implements TaskManager {
                 defaultHistory.remove(subTaskId);
             }
             epic.deleteSubTasksId();
+            calculateEpicDateTime(epic);
             calculateEpicStatus(epic);
         }
     }
@@ -158,6 +161,7 @@ public class InMemoryTaskManager implements TaskManager {
             return;
         }
         subTasks.put(subtask.getId(), subtask);
+        calculateEpicDateTime(savedEpic);
         calculateEpicStatus(savedEpic);
     }
 
@@ -171,6 +175,7 @@ public class InMemoryTaskManager implements TaskManager {
         savedEpic.getSubTasksId().remove(Integer.valueOf(id));
         subTasks.remove(id);
         defaultHistory.remove(id);
+        calculateEpicDateTime(savedEpic);
         calculateEpicStatus(savedEpic);
     }
 
@@ -185,6 +190,7 @@ public class InMemoryTaskManager implements TaskManager {
             subTasks.put(subTask.getId(), subTask);
         }
         savedEpic.getSubTasksId().add(subTask.getId());
+        calculateEpicDateTime(savedEpic);
         calculateEpicStatus(savedEpic);
         return subTask;
     }
@@ -199,6 +205,34 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public List<Task> getHistory() {
         return defaultHistory.getHistory();
+    }
+
+    private void calculateEpicDateTime(Epic epic) {
+        ArrayList<Integer> savedSubTaskId = epic.getSubTasksId();
+        Duration epicDuration = Duration.ofMinutes(0);
+        long durationSecond;
+        LocalDateTime epicStartTime = savedSubTaskId.stream()
+                .map(id -> getSubTask(id))
+                .map(SubTask::getStartTime)
+                .min(LocalDateTime::compareTo)
+                .get();
+
+        durationSecond = savedSubTaskId.stream()
+                .map(id -> getSubTask(id))
+                .map(SubTask::getDuration)
+                .map(time -> time.toSeconds())
+                .mapToLong(x -> x)
+                .sum();
+
+        LocalDateTime epicEndTime = savedSubTaskId.stream()
+                .map(id -> getSubTask(id))
+                .map(SubTask::getStartTime)
+                .max(LocalDateTime::compareTo)
+                .get();
+
+        epic.setEndTime(epicEndTime);
+        epic.setStartTime(epicStartTime);
+        epic.setDuration(epicDuration.plusSeconds(durationSecond));
     }
 
     private void calculateEpicStatus(Epic epic) {

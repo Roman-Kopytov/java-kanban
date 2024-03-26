@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -26,10 +28,15 @@ class FileBackedTaskManagerTest {
         tmpFile = File.createTempFile("data", ".csv");
         manager = new FileBackedTaskManager(historyManager, tmpFile);
 
-        manager.createTask(new Task("First", Status.NEW, "Description1"));
+        manager.createTask(new Task("First", Status.NEW, "Description1",
+                LocalDateTime.of(2024, 2, 1, 0, 0), Duration.ofMinutes(30)));
         Epic epicOne = manager.createEpic(new Epic("Купить билеты", Status.NEW, "Description"));
-        manager.createSubTask(new SubTask("subTaskOne", Status.NEW, "Description", epicOne));
-        manager.createSubTask(new SubTask("subTaskTwo", Status.NEW, "Description", epicOne));
+        manager.createSubTask(new SubTask("subTaskOne", Status.NEW, "Description",
+                null, Duration.ofMinutes(50), epicOne));
+//        manager.createSubTask(new SubTask("subTaskOne", Status.NEW, "Description",
+//                LocalDateTime.of(2024, 1, 1, 0, 0), Duration.ofMinutes(50), epicOne));
+        manager.createSubTask(new SubTask("subTaskTwo", Status.NEW, "Description",
+                LocalDateTime.of(2024, 1, 2, 0, 0), Duration.ofMinutes(80), epicOne));
 
         manager.getTask(1);
         manager.getEpic(2);
@@ -48,7 +55,9 @@ class FileBackedTaskManagerTest {
         assertEquals(manager.getHistory(), manager2.getHistory(), "История должна совпадать");
 
         manager.deleteTask(1);
-        manager.deleteEpic(2);
+        manager.deleteSubTask(3);
+        manager.deleteSubTask(4);
+
         manager2 = FileBackedTaskManager.loadFromFile(tmpFile);
 
         assertEquals(manager.tasks, (manager2.tasks), "Задачи должны совпадать");

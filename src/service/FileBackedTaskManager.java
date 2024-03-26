@@ -8,6 +8,9 @@ import model.*;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -241,18 +244,26 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String name = attributes[2];
         Status status = Status.valueOf(attributes[3]);
         String description = attributes[4];
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy/ HH:mm");
+        LocalDateTime startTime;
+        if (!attributes[5].equals("null")) {
+            startTime = LocalDateTime.parse(attributes[5], formatter);
+        } else {
+            startTime = null;
+        }
+        Duration duration = Duration.ofMinutes(Long.parseLong(attributes[6]));
         Task task = null;
         switch (type) {
             case TASK:
-                task = new Task(name, status, description);
+                task = new Task(name, status, description, startTime, duration);
                 break;
 
             case SUB_TASK:
-                task = new SubTask(name, status, description, Integer.parseInt(attributes[5]));
+                task = new SubTask(name, status, description, startTime, duration, Integer.parseInt(attributes[7]));
                 break;
 
             case EPIC:
-                task = new Epic(name, status, description);
+                task = new Epic(name, status, description, startTime, duration);
                 break;
 
         }
@@ -262,7 +273,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private void save() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-            writer.append("id,type,name,status,description,epic");
+            writer.append("id,type,name,status,description,startTime,duration,epicId");
             writer.newLine();
             for (Map.Entry<Integer, Task> entry : super.tasks.entrySet()) {
                 writer.append(toString(entry.getValue()));
@@ -331,6 +342,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             historyFromString(line);
             for (SubTask subTask : subTasks.values()) {
                 addSubTaskToEpic(subTask);
+            }
+            for (Epic epic : epics.values()) {
+                calculateEpicDateTime(epic);
             }
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка в файле: " + file.getAbsolutePath(), e);

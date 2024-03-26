@@ -1,16 +1,20 @@
 package model;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Objects;
 
-@SuppressWarnings("checkstyle:Regexp")
 public class Epic extends Task {
     private final ArrayList<Integer> subTasksId = new ArrayList<>();
     private LocalDateTime endTime;
 
     public Epic(String name, Status status, String description) {
         super(name, status, description);
+    }
+
+    public Epic(String name, Status status, String description, LocalDateTime startTime, Duration duration) {
+        super(name, status, description, startTime, duration);
     }
 
 

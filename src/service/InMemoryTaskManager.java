@@ -59,7 +59,6 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Task createTask(Task task) {
         task.setId(generateId());
-        tasks.put(task.getId(), task);
         return task;
     }
 
@@ -73,6 +72,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Epic createEpic(Epic epic) {
         epic.setId(generateId());
+        calculateEpicDateTime(epic);
         epics.put(epic.getId(), epic);
         return epic;
     }
@@ -207,35 +207,50 @@ public class InMemoryTaskManager implements TaskManager {
         return defaultHistory.getHistory();
     }
 
-    private void calculateEpicDateTime(Epic epic) {
+    protected void calculateEpicDateTime(Epic epic) {
         ArrayList<Integer> savedSubTaskId = epic.getSubTasksId();
-        Duration epicDuration = Duration.ofMinutes(0);
-        long durationSecond;
-        LocalDateTime epicStartTime = savedSubTaskId.stream()
-                .map(id -> getSubTask(id))
-                .map(SubTask::getStartTime)
-                .min(LocalDateTime::compareTo)
-                .get();
+        if (savedSubTaskId.size() != 0) {
+            Duration epicDuration = Duration.ofMinutes(0);
+            long durationMinutes = 0;
+            LocalDateTime minStartTime = LocalDateTime.MAX;
+            LocalDateTime maxEndTime = LocalDateTime.MIN;
+            for (Integer id : savedSubTaskId) {
+                SubTask savedSubTask = getSubTask(id);
+                LocalDateTime savedStartTime = savedSubTask.getStartTime();
+                LocalDateTime savedEndTime;
+                if (savedStartTime == null) {
+                    epic.setStartTime(savedStartTime);
+                    epic.setDuration(epicDuration.plusMinutes(durationMinutes));
+                    epic.setEndTime(savedStartTime);
+                } else {
+                    savedEndTime = savedSubTask.getEndTime();
+                    if (savedStartTime.isBefore(minStartTime)) {
+                        minStartTime = savedStartTime;
+                    }
+                    if (savedEndTime.isAfter(maxEndTime)) {
+                        maxEndTime = savedEndTime;
+                    }
+                }
+                durationMinutes = durationMinutes + savedSubTask.getDuration().toMinutes();
+            }
+            epic.setStartTime(minStartTime);
+            epic.setDuration(epicDuration.plusMinutes(durationMinutes));
+            epic.setEndTime(maxEndTime);
 
-        durationSecond = savedSubTaskId.stream()
-                .map(id -> getSubTask(id))
-                .map(SubTask::getDuration)
-                .map(time -> time.toSeconds())
-                .mapToLong(x -> x)
-                .sum();
+        } else {
+            epic.setStartTime(null);
+            epic.setDuration(Duration.ZERO);
+            epic.setEndTime(null);
+        }
 
-        LocalDateTime epicEndTime = savedSubTaskId.stream()
-                .map(id -> getSubTask(id))
-                .map(SubTask::getStartTime)
-                .max(LocalDateTime::compareTo)
-                .get();
 
-        epic.setEndTime(epicEndTime);
-        epic.setStartTime(epicStartTime);
-        epic.setDuration(epicDuration.plusSeconds(durationSecond));
     }
 
-    private void calculateEpicStatus(Epic epic) {
+//    protected <T extends Task> TreeSet<T> getPrioritizedTasks() {
+//
+//    }
+
+    protected void calculateEpicStatus(Epic epic) {
         ArrayList<Integer> savedSubTaskId = epic.getSubTasksId();
         int counterDoneStatus = 0;
         int counterNewStatus = 0;

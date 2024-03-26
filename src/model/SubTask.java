@@ -17,9 +17,14 @@ public class SubTask extends Task {
         this.epicId = id;
     }
 
-    public SubTask(String name, Status status, String description, Duration duration, LocalDateTime startTime, int epicId) {
-        super(name, status, description, duration, startTime);
-        this.epicId = epicId;
+    public SubTask(String name, Status status, String description, LocalDateTime startTime, Duration duration, Epic epic) {
+        super(name, status, description, startTime, duration);
+        this.epicId = epic.getId();
+    }
+
+    public SubTask(String name, Status status, String description, LocalDateTime startTime, Duration duration, Integer id) {
+        super(name, status, description, startTime, duration);
+        this.epicId = id;
     }
 
     @Override

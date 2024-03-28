@@ -1,10 +1,3 @@
-id,type,name,status,description,epic
-1,TASK,Переезд,IN_PROGRESS,Нужно переехать в Сосновый бор
-2,TASK,Поездка в сочи,DONE,Нужно собрать вещи
-4,SUB_TASK,Зайти в приложение тинькофф,IN_PROGRESS,Возьми телефон и зайди в приложение.,3
-5,SUB_TASK,Выбрать билеты,DONE,Выбери самые выгодные билеты.,3
-7,SUB_TASK,Купить цветы,NEW,Купи красивый букет цветов,6
-3,EPIC,Купить билеты,IN_PROGRESS,Нужно купить как можно быстрее билеты.
-6,EPIC,Поцеловать жену,NEW,Встретиться с женой и чмокнуть ее.
+id,type,name,status,description,startTime,duration,epicId
+1,TASK,addNewTask2,NEW,addNewTask description,02.01.2024/ 00:00,10
 
-1,2,3,5,7,

@@ -12,6 +12,8 @@ import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.TreeSet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -29,14 +31,18 @@ class FileBackedTaskManagerTest {
         manager = new FileBackedTaskManager(historyManager, tmpFile);
 
         manager.createTask(new Task("First", Status.NEW, "Description1",
-                LocalDateTime.of(2024, 2, 1, 0, 0), Duration.ofMinutes(30)));
+                LocalDateTime.of(2025, 2, 1, 0, 0), Duration.ofMinutes(30)));
+
         Epic epicOne = manager.createEpic(new Epic("Купить билеты", Status.NEW, "Description"));
+
         manager.createSubTask(new SubTask("subTaskOne", Status.NEW, "Description",
-                null, Duration.ofMinutes(50), epicOne));
-//        manager.createSubTask(new SubTask("subTaskOne", Status.NEW, "Description",
-//                LocalDateTime.of(2024, 1, 1, 0, 0), Duration.ofMinutes(50), epicOne));
+                LocalDateTime.of(2024, 1, 2, 0, 0), Duration.ofMinutes(50), epicOne));
+
         manager.createSubTask(new SubTask("subTaskTwo", Status.NEW, "Description",
-                LocalDateTime.of(2024, 1, 2, 0, 0), Duration.ofMinutes(80), epicOne));
+                LocalDateTime.of(2023, 1, 1, 0, 0), Duration.ofMinutes(80), epicOne));
+
+        manager.createSubTask(new SubTask("subTaskThree", Status.NEW, "Description",
+                null, Duration.ofMinutes(50), epicOne));
 
         manager.getTask(1);
         manager.getEpic(2);
@@ -66,5 +72,18 @@ class FileBackedTaskManagerTest {
         assertEquals(manager.getHistory(), manager2.getHistory(), "История должна совпадать");
 
         tmpFile.deleteOnExit();
+    }
+
+    @Test
+    @DisplayName("Должен сортировать задачи по startTime")
+    public void shouldReturnPrioritizedTasks() {
+        ArrayList<Task> expectedList = new ArrayList<>();
+        expectedList.add(manager.getSubTask(4));
+        expectedList.add(manager.getSubTask(3));
+        expectedList.add(manager.getTask(1));
+
+        TreeSet<Task> actualList = manager.getPrioritizedTasks();
+
+        assertEquals(expectedList, new ArrayList<>(actualList));
     }
 }

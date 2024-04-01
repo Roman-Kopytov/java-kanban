@@ -45,14 +45,16 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateTask(Task task) {
-        if (!tasks.containsKey(task.getId())) {
+        Task savedTask = tasks.get(task.getId());
+        if (savedTask == null) {
             return;
         }
         if (!isTaskIntersect(task)) {
-            tasks.put(task.getId(), task);
             if (task.getStartTime() != null) {
+                prioritizedTasks.remove(savedTask);
                 prioritizedTasks.add(task);
             }
+            tasks.put(task.getId(), task);
         } else {
             throw new ValidationException("There is an intersection in execution time with task number="
                     + task.getId());
@@ -70,8 +72,8 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Task createTask(Task task) {
-        task.setId(generateId());
         if (!isTaskIntersect(task)) {
+            task.setId(generateId());
             tasks.put(task.getId(), task);
             if (task.getStartTime() != null) {
                 prioritizedTasks.add(task);
@@ -96,7 +98,6 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Epic createEpic(Epic epic) {
         epic.setId(generateId());
-        calculateEpicDateTime(epic);
         epics.put(epic.getId(), epic);
         return epic;
     }
@@ -106,6 +107,7 @@ public class InMemoryTaskManager implements TaskManager {
         Epic savedEpic = epics.get(id);
         if (savedEpic != null) {
             for (Integer subTaskId : savedEpic.getSubTasksId()) {
+                prioritizedTasks.remove(subTasks.get(subTaskId));
                 subTasks.remove(subTaskId);
                 defaultHistory.remove(subTaskId);
             }
@@ -147,7 +149,8 @@ public class InMemoryTaskManager implements TaskManager {
         if (saved == null) {
             throw new NotFoundException("Задача с id = " + epic.getId());
         }
-        epics.put(epic.getId(), epic);
+        saved.setName(epic.getName());
+        saved.setDescription(epic.getDescription());
     }
 
     @Override
@@ -191,10 +194,12 @@ public class InMemoryTaskManager implements TaskManager {
         }
         if (!isTaskIntersect(subTask)) {
             if (subTask.getStartTime() != null) {
+                prioritizedTasks.remove(subTasks.get(subTask.getId()));
                 prioritizedTasks.add(subTask);
             }
             subTasks.put(subTask.getId(), subTask);
             calculateEpicDateTime(savedEpic);
+            calculateEpicStatus(savedEpic);
         } else {
             throw new ValidationException("There is an intersection in execution time with task number="
                     + subTask.getId());
@@ -225,6 +230,7 @@ public class InMemoryTaskManager implements TaskManager {
             subTask.setId(generateId());
             if (!isTaskIntersect(subTask)) {
                 subTasks.put(subTask.getId(), subTask);
+
                 savedEpic.getSubTasksId().add(subTask.getId());
                 if (subTask.getStartTime() != null) {
                     prioritizedTasks.add(subTask);
@@ -254,6 +260,12 @@ public class InMemoryTaskManager implements TaskManager {
         return defaultHistory.getHistory();
     }
 
+    @Override
+    public List<Task> getPrioritizedTasks() {
+        return new ArrayList<>(prioritizedTasks);
+    }
+
+
     protected void calculateEpicDateTime(Epic epic) {
         ArrayList<Integer> savedSubTaskId = epic.getSubTasksId();
         if (!savedSubTaskId.isEmpty()) {
@@ -266,7 +278,7 @@ public class InMemoryTaskManager implements TaskManager {
                 LocalDateTime savedStartTime = savedSubTask.getStartTime();
                 LocalDateTime savedEndTime;
                 if (savedStartTime == null) {
-                    epic.setDuration(epicDuration.plusMinutes(durationMinutes));
+                    continue;
                 } else {
                     savedEndTime = savedSubTask.getEndTime();
                     if (savedStartTime.isBefore(minStartTime)) {
@@ -289,10 +301,6 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    protected TreeSet<Task> getPrioritizedTasks() {
-        TreeSet<Task> sortedTask = prioritizedTasks;
-        return sortedTask;
-    }
 
     protected <T extends Task> boolean isTaskIntersect(T task) {
         if (task.getStartTime() != null) {

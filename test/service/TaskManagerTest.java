@@ -10,8 +10,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -30,11 +32,10 @@ abstract class TaskManagerTest<T extends TaskManager> {
     SubTask subTaskFourth;
 
 
-    abstract T createManager();
+    abstract T createManager() throws IOException;
 
     @BeforeEach
-    public void beforeEach() {
-
+    public void beforeEach() throws IOException {
         manager = createManager();
         taskFirst = manager.createTask(new Task("addNewTask1", Status.NEW, "addNewTask description",
                 null, Duration.ofMinutes(30)));
@@ -53,6 +54,13 @@ abstract class TaskManagerTest<T extends TaskManager> {
                 LocalDateTime.of(2024, 2, 2, 0, 0), Duration.ofMinutes(60), epicSecond));
         subTaskFourth = manager.createSubTask(new SubTask("NewSubTask4", Status.NEW, "NewSubtask description",
                 LocalDateTime.of(2024, 2, 3, 0, 0), Duration.ofMinutes(60), epicSecond));
+
+        manager.getEpic(3);
+        manager.getTask(2);
+        manager.getSubTask(6);
+        manager.getEpic(4);
+        manager.getEpic(4);
+        manager.getEpic(3);
     }
 
     @Test
@@ -158,7 +166,10 @@ abstract class TaskManagerTest<T extends TaskManager> {
         Epic testEpic = new Epic("Update name", Status.IN_PROGRESS, "Update description");
         testEpic.setId(epicId);
         manager.updateEpic(testEpic);
-        assertEquals(manager.getEpic(epicId), testEpic, "Должны быть равны");
+
+        assertEquals(manager.getEpic(epicId).getName(), testEpic.getName(), "Должны быть равны");
+        assertEquals(manager.getEpic(epicId).getDescription(), testEpic.getDescription(), "Должны быть равны");
+        assertEquals(manager.getEpic(epicId).getStatus(), Status.NEW, "Должны быть равны");
     }
 
     @Test
@@ -222,19 +233,20 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     @DisplayName("Должен возвращать список обращений к задачам")
     void shouldGetHistory() {
-        final int epicIdFirst = epicFirst.getId();
-        final int epicIdSecond = epicSecond.getId();
-        final int taskIdSecond = taskSecond.getId();
-        final int subTuskIdSecond = subTaskSecond.getId();
-        manager.getEpic(epicIdFirst);
-        manager.getTask(taskIdSecond);
-        manager.getSubTask(subTuskIdSecond);
-        manager.getEpic(epicIdSecond);
-        manager.getEpic(epicIdSecond);
-        manager.getEpic(epicIdFirst);
         List<Task> historyList = manager.getHistory();
         List<Task> expectedList = List.of(taskSecond, subTaskSecond, epicSecond, epicFirst);
 
         assertEquals(expectedList, historyList, "Должны совпадать");
+    }
+
+    @Test
+    @DisplayName("Эпик не должен хранить неактуальные подзадачи")
+    void shouldDeleteSubtaskFromEpic() {
+        final int epicId = epicFirst.getId();
+        final int subTaskFirstId = subTaskFirst.getId();
+        manager.deleteSubTask(subTaskFirstId);
+        List<Task> expectedList = new ArrayList<>();
+        expectedList.add(subTaskSecond);
+        assertEquals(expectedList, manager.getEpicSubTasks(epicId), "Списки должны совпадать");
     }
 }

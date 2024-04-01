@@ -5,7 +5,12 @@ import model.SubTask;
 import java.time.format.DateTimeFormatter;
 
 public class SubTaskConverter implements Converter<SubTask> {
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy/ HH:mm");
+
+    private final DateTimeFormatter formatter;
+
+    public SubTaskConverter(DateTimeFormatter formatter) {
+        this.formatter = formatter;
+    }
 
     @Override
     public String toString(SubTask task) {

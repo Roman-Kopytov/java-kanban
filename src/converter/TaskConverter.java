@@ -5,7 +5,12 @@ import model.Task;
 import java.time.format.DateTimeFormatter;
 
 public class TaskConverter implements Converter<Task> {
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy/ HH:mm");
+
+    private final DateTimeFormatter formatter;
+
+    public TaskConverter(DateTimeFormatter formatter) {
+        this.formatter = formatter;
+    }
 
     @Override
     public String toString(Task task) {

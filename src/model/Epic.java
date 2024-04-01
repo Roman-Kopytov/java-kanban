@@ -12,7 +12,7 @@ public class Epic extends Task {
     public Epic(String name, Status status, String description) {
         super(name, status, description);
         super.startTime = null;
-        super.duration = null;
+        super.duration = Duration.ZERO;
     }
 
     public Epic(String name, Status status, String description, LocalDateTime startTime, Duration duration) {

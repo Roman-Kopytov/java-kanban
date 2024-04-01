@@ -21,13 +21,13 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 public class FileBackedTaskManager extends InMemoryTaskManager {
     public static final String TASK_CSV = "resources/task.CSV";
     private final File file;
+    private DateTimeFormatter formatter;
 
     private Map<TaskType, Converter> converters = new HashMap<>();
 
     public FileBackedTaskManager() {
         this(Managers.getDefaultHistory());
         converters = fillConvertersMap();
-
     }
 
     public FileBackedTaskManager(HistoryManager historyManager) {
@@ -83,57 +83,15 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     public static void main(String[] args) {
-        HistoryManager historyManager = new InMemoryHistoryManager();
-        FileBackedTaskManager manager = new FileBackedTaskManager(historyManager);
 
-        Task tripdNew = manager.createTask(new Task("Переезд", Status.NEW, "Нужно переехать в Сосновый бор"));
-        Task sochiNew = manager.createTask(new Task("Поездка в сочи", Status.NEW, "Нужно собрать вещи"));
-
-        Epic ticketNew = manager.createEpic(new Epic("Купить билеты", Status.NEW, "Нужно купить как можно быстрее билеты."));
-        SubTask tinkoffNew = manager.createSubTask(new SubTask("Зайти в приложение тинькофф", Status.NEW, "Возьми телефон и зайди в приложение.", ticketNew));
-        SubTask buyNew = manager.createSubTask(new SubTask("Выбрать билеты", Status.NEW, "Выбери самые выгодные билеты.", ticketNew));
-
-        Epic kissNew = manager.createEpic(new Epic("Поцеловать жену", Status.NEW, "Встретиться с женой и чмокнуть ее."));
-        SubTask flowersNew = manager.createSubTask(new SubTask("Купить цветы", Status.NEW, "Купи красивый букет цветов", kissNew));
-        tripdNew.setStatus(Status.IN_PROGRESS);
-        sochiNew.setStatus(Status.DONE);
-        tinkoffNew.setStatus(Status.IN_PROGRESS);
-        buyNew.setStatus(Status.DONE);
-
-        manager.updateSubTask(tinkoffNew);
-        manager.updateSubTask(buyNew);
-        manager.updateTask(tripdNew);
-        manager.updateTask(sochiNew);
-
-        System.out.println(manager.getAllEpic());
-        System.out.println();
-        System.out.println(manager.getAllSubTask());
-        System.out.println();
-        System.out.println(manager.getAllTask());
-
-        manager.getTask(1);
-        manager.getTask(2);
-        System.out.println(historyManager.getHistory());
-        manager.getTask(1);
-        manager.getTask(2);
-        manager.getEpic(3);
-        manager.getSubTask(5);
-        manager.getSubTask(7);
-
-        System.out.println(historyManager.getHistory());
-
-
-        FileBackedTaskManager manager2;
-        File file = new File("resources/task.CSV");
-        manager2 = loadFromFile(file);
-        System.out.println(manager2.getEpicSubTasks(6));
     }
 
     Map<TaskType, Converter> fillConvertersMap() {
         Map<TaskType, Converter> converters = new HashMap<>();
-        converters.put(TaskType.TASK, new TaskConverter());
-        converters.put(TaskType.EPIC, new EpicConverter());
-        converters.put(TaskType.SUB_TASK, new SubTaskConverter());
+        formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy/ HH:mm:ss");
+        converters.put(TaskType.TASK, new TaskConverter(formatter));
+        converters.put(TaskType.EPIC, new EpicConverter(formatter));
+        converters.put(TaskType.SUB_TASK, new SubTaskConverter(formatter));
         return converters;
     }
 
@@ -245,7 +203,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String name = attributes[2];
         Status status = Status.valueOf(attributes[3]);
         String description = attributes[4];
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy/ HH:mm");
         LocalDateTime startTime;
         if (!attributes[5].equals("null")) {
             startTime = LocalDateTime.parse(attributes[5], formatter);
@@ -327,8 +284,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 final int id = task.getId();
                 if (task.getType() == TaskType.TASK) {
                     tasks.put(id, task);
+                    if (task.getStartTime() != null) {
+                        prioritizedTasks.add(task);
+                    }
                 } else if (task.getType() == TaskType.SUB_TASK) {
                     subTasks.put(id, (SubTask) task);
+                    if (task.getStartTime() != null) {
+                        prioritizedTasks.add(task);
+                    }
                 } else if (task.getType() == TaskType.EPIC) {
                     epics.put(id, (Epic) task);
                 }

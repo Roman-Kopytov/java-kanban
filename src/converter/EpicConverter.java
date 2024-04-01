@@ -6,7 +6,11 @@ import java.time.format.DateTimeFormatter;
 
 public class EpicConverter implements Converter<Epic> {
 
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy/ HH:mm");
+    private final DateTimeFormatter formatter;
+
+    public EpicConverter(DateTimeFormatter formatter) {
+        this.formatter = formatter;
+    }
 
     @Override
     public String toString(Epic task) {

@@ -2,7 +2,7 @@ package model;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SubTaskTest {
 
@@ -17,8 +17,8 @@ class SubTaskTest {
     @Test
     void shouldBeEquals() {
         Epic epic = new Epic("First", Status.NEW, "Creation");
-        SubTask subTaskactual = new SubTask("First", Status.NEW, "Creation",epic);
-        SubTask subTaskExpected = new SubTask("First", Status.NEW, "Creation",epic);
+        SubTask subTaskactual = new SubTask("First", Status.NEW, "Creation", epic);
+        SubTask subTaskExpected = new SubTask("First", Status.NEW, "Creation", epic);
         assertEqualsSubTask(subTaskExpected, subTaskactual, "Task должны совпадать");
     }
 }

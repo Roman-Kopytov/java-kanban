@@ -1,17 +1,30 @@
 package model;
 
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 public class Task {
     protected int id;
     protected String name;
     protected Status status;
     protected String description;
+    protected Duration duration;
+    protected LocalDateTime startTime;
 
 
     public Task(String name, Status status, String description) {
         this.name = name;
         this.status = status;
         this.description = description;
+    }
+
+    public Task(String name, Status status, String description, LocalDateTime startTime, Duration duration) {
+        this.name = name;
+        this.status = status;
+        this.description = description;
+        this.duration = duration;
+        this.startTime = startTime;
     }
 
     @Override
@@ -63,6 +76,26 @@ public class Task {
 
     public TaskType getType() {
         return TaskType.TASK;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return startTime.plus(duration);
     }
 
 

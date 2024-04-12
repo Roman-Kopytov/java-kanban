@@ -2,6 +2,7 @@ package controller;
 
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
+import exception.BadRequest;
 import exception.ManagerSaveException;
 import exception.NotFoundException;
 import exception.ValidationException;
@@ -35,6 +36,11 @@ public class ErrorHandler {
     public void handle(HttpExchange httpExchange, Exception e) throws IOException {
         e.printStackTrace();
         writeResponse(httpExchange, 500, "");
+    }
+
+    public void handle(HttpExchange httpExchange, BadRequest e) throws IOException {
+        e.printStackTrace();
+        writeResponse(httpExchange, 400, "");
     }
 
     private void writeResponse(HttpExchange httpExchange, int statusCode, String json) throws IOException {

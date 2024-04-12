@@ -1,14 +1,11 @@
-package server;
+package service;
 
 import adapters.DurationAdapter;
 import adapters.LocalDateTimeAdapter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpServer;
 import controller.*;
-import service.Managers;
-import service.TaskManager;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -44,11 +41,6 @@ public class HttpTaskServer {
     }
 
 
-    private void sendText(HttpExchange httpExchange, String json) {
-
-    }
-
-
     public void stop() {
         httpServer.stop(0);
         System.out.println("Остановлен сервер на порту " + PORT);
@@ -59,11 +51,12 @@ public class HttpTaskServer {
         httpServer.start();
     }
 
-    static Gson getGson() {
+    public static Gson getGson() {
         GsonBuilder gsonBuilder = new GsonBuilder();
         return gsonBuilder
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
                 .registerTypeAdapter(Duration.class, new DurationAdapter())
+                .serializeNulls()
                 .create();
     }
 

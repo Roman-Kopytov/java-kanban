@@ -3,6 +3,7 @@ package controller;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import exception.BadRequest;
 import exception.ManagerSaveException;
 import exception.NotFoundException;
 import exception.ValidationException;
@@ -34,6 +35,8 @@ public abstract class BaseHandler implements HttpHandler {
         } catch (NotFoundException e) {
             errorHandler.handle(exchange, e);
         } catch (ValidationException e) {
+            errorHandler.handle(exchange, e);
+        } catch (BadRequest e) {
             errorHandler.handle(exchange, e);
         } catch (Exception e) {
             errorHandler.handle(exchange, e);

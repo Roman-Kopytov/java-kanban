@@ -13,11 +13,11 @@ import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
 
-    protected final HistoryManager defaultHistory;
-    protected TreeSet<Task> prioritizedTasks = new TreeSet<>(Comparator.comparing(Task::getStartTime));
-    protected final HashMap<Integer, Task> tasks = new HashMap<>();
-    protected final HashMap<Integer, Epic> epics = new HashMap<>();
-    protected final HashMap<Integer, SubTask> subTasks = new HashMap<>();
+    final HistoryManager defaultHistory;
+    TreeSet<Task> prioritizedTasks = new TreeSet<>(Comparator.comparing(Task::getStartTime));
+    final HashMap<Integer, Task> tasks = new HashMap<>();
+    final HashMap<Integer, Epic> epics = new HashMap<>();
+    final HashMap<Integer, SubTask> subTasks = new HashMap<>();
     protected int seq = 0;
 
     public InMemoryTaskManager(HistoryManager defaultHistory) {

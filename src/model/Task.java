@@ -27,6 +27,9 @@ public class Task {
         this.startTime = startTime;
     }
 
+    public Task() {
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

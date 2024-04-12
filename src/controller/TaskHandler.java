@@ -2,6 +2,7 @@ package controller;
 
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
+import exception.BadRequest;
 import exception.NotFoundException;
 import model.Task;
 import service.TaskManager;
@@ -58,6 +59,9 @@ public class TaskHandler extends BaseHandler {
         if (splitPath.length == 2) {
             InputStream inputStream = exchange.getRequestBody();
             String body = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+            if (body.isEmpty()) {
+                throw new BadRequest();
+            }
             Task task = gson.fromJson(body, Task.class);
             int id = task.getId();
             if (id != 0) {

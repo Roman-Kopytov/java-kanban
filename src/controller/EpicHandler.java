@@ -2,6 +2,7 @@ package controller;
 
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
+import exception.BadRequest;
 import exception.NotFoundException;
 import model.Epic;
 import service.TaskManager;
@@ -54,10 +55,13 @@ public class EpicHandler extends BaseHandler {
         if (splitPath.length == 2) {
             InputStream inputStream = exchange.getRequestBody();
             String body = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+            if (body.isEmpty()) {
+                throw new BadRequest();
+            }
             Epic epic = gson.fromJson(body, Epic.class);
             int id = epic.getId();
             if (id != 0) {
-                manager.updateTask(epic);
+                manager.updateEpic(epic);
                 sendText(exchange, 200, gson.toJson(manager.getEpic(id)));
             } else {
                 sendText(exchange, 201, gson.toJson(manager.createEpic(epic)));

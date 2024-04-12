@@ -30,7 +30,7 @@ public class PrioritizedHandler extends BaseHandler {
 
     private void handleGetRequest(HttpExchange exchange, String[] splitPath) throws IOException {
         if (splitPath.length == 2) {
-            sendText(exchange, 200, gson.toJson(manager.getHistory()));
+            sendText(exchange, 200, gson.toJson(manager.getPrioritizedTasks()));
         } else {
             throw new NotFoundException("Invalid path");
         }

@@ -2,6 +2,7 @@ package controller;
 
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
+import exception.BadRequest;
 import exception.NotFoundException;
 import model.SubTask;
 import service.TaskManager;
@@ -56,10 +57,13 @@ public class SubTaskHandler extends BaseHandler {
         if (splitPath.length == 2) {
             InputStream inputStream = exchange.getRequestBody();
             String body = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+            if (body.isEmpty()) {
+                throw new BadRequest();
+            }
             SubTask subTask = gson.fromJson(body, SubTask.class);
             int id = subTask.getId();
             if (id != 0) {
-                manager.updateTask(subTask);
+                manager.updateSubTask(subTask);
                 sendText(exchange, 200, gson.toJson(manager.getSubTask(id)));
             } else {
                 sendText(exchange, 201, gson.toJson(manager.createSubTask(subTask)));

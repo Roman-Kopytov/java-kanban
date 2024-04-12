@@ -2,6 +2,7 @@ package controller;
 
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
+import exception.NotFoundException;
 import model.SubTask;
 import service.TaskManager;
 
@@ -10,19 +11,15 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
-public class SubTaskHandler extends BaseHandler implements PathHandler {
+public class SubTaskHandler extends BaseHandler {
 
     public SubTaskHandler(TaskManager manager, Gson gson) {
         super(manager, gson);
     }
 
-    @Override
-    public String getPath() {
-        return "epic";
-    }
 
     @Override
-    public void handle(HttpExchange exchange) throws IOException {
+    public void prepareResponse(HttpExchange exchange) throws IOException {
         String method = exchange.getRequestMethod();
         String[] splitPath = exchange.getRequestURI().getPath().split("/");
         switch (method) {
@@ -44,21 +41,14 @@ public class SubTaskHandler extends BaseHandler implements PathHandler {
         if (splitPath.length == 3) {
             Optional<Integer> id = getId(exchange);
             if (id.isPresent()) {
-                try (exchange) {
-                    manager.deleteTask(id.get());
-                    exchange.sendResponseHeaders(204, 0);
-                } catch (Exception e) {
-                    errorHandler.handle(exchange, e);
-                }
-            }
-
-        } else if (splitPath.length == 2) {
-            try (exchange) {
-                manager.deleteAllTask();
+                manager.deleteSubTask(id.get());
                 exchange.sendResponseHeaders(204, 0);
-            } catch (Exception e) {
-                errorHandler.handle(exchange, e);
             }
+        } else if (splitPath.length == 2) {
+            manager.deleteAllSubTask();
+            exchange.sendResponseHeaders(204, 0);
+        } else {
+            throw new NotFoundException("Invalid path");
         }
     }
 
@@ -69,39 +59,27 @@ public class SubTaskHandler extends BaseHandler implements PathHandler {
             SubTask subTask = gson.fromJson(body, SubTask.class);
             int id = subTask.getId();
             if (id != 0) {
-                try (exchange) {
-                    manager.updateTask(subTask);
-                    sendText(exchange, 200, gson.toJson(manager.getSubTask(id)));
-                } catch (Exception e) {
-                    errorHandler.handle(exchange, e);
-                }
+                manager.updateTask(subTask);
+                sendText(exchange, 200, gson.toJson(manager.getSubTask(id)));
             } else {
-                try (exchange) {
-                    sendText(exchange, 201, gson.toJson(manager.createTask(subTask)));
-                } catch (Exception e) {
-                    errorHandler.handle(exchange, e);
-                }
+                sendText(exchange, 201, gson.toJson(manager.createSubTask(subTask)));
             }
+        } else {
+            throw new NotFoundException("Invalid path");
         }
 
     }
 
     private void handleGetRequest(HttpExchange exchange, String[] splitPath) throws IOException {
         if (splitPath.length == 2) {
-            try (exchange) {
-                sendText(exchange, 200, gson.toJson(manager.getAllSubTask()));
-            } catch (Exception e) {
-                errorHandler.handle(exchange, e);
-            }
+            sendText(exchange, 200, gson.toJson(manager.getAllSubTask()));
         } else if (splitPath.length == 3) {
             Optional<Integer> id = getId(exchange);
             if (id.isPresent()) {
-                try (exchange) {
-                    sendText(exchange, 200, gson.toJson(manager.getSubTask(id.get())));
-                } catch (Exception e) {
-                    errorHandler.handle(exchange, e);
-                }
+                sendText(exchange, 200, gson.toJson(manager.getSubTask(id.get())));
             }
+        } else {
+            throw new NotFoundException("Invalid path");
         }
     }
 }

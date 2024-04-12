@@ -2,6 +2,7 @@ package controller;
 
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
+import exception.NotFoundException;
 import model.Epic;
 import service.TaskManager;
 
@@ -10,18 +11,13 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
-public class EpicHandler extends BaseHandler implements PathHandler {
+public class EpicHandler extends BaseHandler {
     public EpicHandler(TaskManager manager, Gson gson) {
         super(manager, gson);
     }
 
     @Override
-    public String getPath() {
-        return "epic";
-    }
-
-    @Override
-    public void handle(HttpExchange exchange) throws IOException {
+    public void prepareResponse(HttpExchange exchange) throws IOException {
         String[] splitPath = exchange.getRequestURI().getPath().split("/");
         String method = exchange.getRequestMethod();
         switch (method) {
@@ -43,20 +39,14 @@ public class EpicHandler extends BaseHandler implements PathHandler {
         if (splitPath.length == 3) {
             Optional<Integer> id = getId(exchange);
             if (id.isPresent()) {
-                try (exchange) {
-                    manager.deleteEpic(id.get());
-                    exchange.sendResponseHeaders(204, 0);
-                } catch (Exception e) {
-                    errorHandler.handle(exchange, e);
-                }
+                manager.deleteEpic(id.get());
+                exchange.sendResponseHeaders(204, 0);
             }
         } else if (splitPath.length == 2) {
-            try (exchange) {
-                manager.deleteAllEpic();
-                exchange.sendResponseHeaders(204, 0);
-            } catch (Exception e) {
-                errorHandler.handle(exchange, e);
-            }
+            manager.deleteAllEpic();
+            exchange.sendResponseHeaders(204, 0);
+        } else {
+            throw new NotFoundException("Invalid path");
         }
     }
 
@@ -67,46 +57,32 @@ public class EpicHandler extends BaseHandler implements PathHandler {
             Epic epic = gson.fromJson(body, Epic.class);
             int id = epic.getId();
             if (id != 0) {
-                try (exchange) {
-                    manager.updateTask(epic);
-                    sendText(exchange, 200, gson.toJson(manager.getTask(id)));
-                } catch (Exception e) {
-                    errorHandler.handle(exchange, e);
-                }
+                manager.updateTask(epic);
+                sendText(exchange, 200, gson.toJson(manager.getEpic(id)));
             } else {
-                try (exchange) {
-                    sendText(exchange, 201, gson.toJson(manager.createTask(epic)));
-                } catch (Exception e) {
-                    errorHandler.handle(exchange, e);
-                }
+                sendText(exchange, 201, gson.toJson(manager.createEpic(epic)));
             }
+        } else {
+            throw new NotFoundException("Invalid path");
         }
     }
 
     private void handleGetRequest(HttpExchange exchange, String[] splitPath) throws IOException {
-        Optional<Integer> id = getId(exchange);
+        Optional<Integer> id;
         if (splitPath.length == 4 && splitPath[3].equals("subtasks")) {
+            id = getId(exchange);
             if (id.isPresent()) {
-                try (exchange) {
-                    sendText(exchange, 200, gson.toJson(manager.getEpicSubTasks(id.get())));
-                } catch (Exception e) {
-                    errorHandler.handle(exchange, e);
-                }
+                sendText(exchange, 200, gson.toJson(manager.getEpicSubTasks(id.get())));
             }
         } else if (splitPath.length == 3) {
+            id = getId(exchange);
             if (id.isPresent()) {
-                try (exchange) {
-                    sendText(exchange, 200, gson.toJson(manager.getEpic(id.get())));
-                } catch (Exception e) {
-                    errorHandler.handle(exchange, e);
-                }
+                sendText(exchange, 200, gson.toJson(manager.getEpic(id.get())));
             }
         } else if ((splitPath.length == 2)) {
-            try (exchange) {
-                sendText(exchange, 200, gson.toJson(manager.getAllEpic()));
-            } catch (Exception e) {
-                errorHandler.handle(exchange, e);
-            }
+            sendText(exchange, 200, gson.toJson(manager.getAllEpic()));
+        } else {
+            throw new NotFoundException("Invalid path");
         }
     }
 }

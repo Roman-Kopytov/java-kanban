@@ -11,8 +11,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" exported="" name="lib" level="application" />
-    <orderEntry type="module-library" scope="TEST">
+    <orderEntry type="module-library" exported="" scope="TEST">
       <library name="JUnit5.8.1">
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/junit-jupiter-5.8.1.jar!/" />
@@ -28,7 +27,7 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module-library" scope="TEST">
+    <orderEntry type="module-library" exported="" scope="TEST">
       <library name="JUnit5.8.1">
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/junit-jupiter-5.8.1.jar!/" />
@@ -39,6 +38,17 @@
           <root url="jar://$MODULE_DIR$/lib/junit-jupiter-params-5.8.1.jar!/" />
           <root url="jar://$MODULE_DIR$/lib/junit-jupiter-engine-5.8.1.jar!/" />
           <root url="jar://$MODULE_DIR$/lib/junit-platform-engine-1.8.1.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="library" exported="" name="lib" level="application" />
+    <orderEntry type="library" name="gson-2.9.0" level="project" />
+    <orderEntry type="module-library" exported="">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/gson-2.10.1.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

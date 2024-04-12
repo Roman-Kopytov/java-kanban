@@ -7,7 +7,12 @@ import java.util.Objects;
 
 public class Epic extends Task {
     private final ArrayList<Integer> subTasksId = new ArrayList<>();
+
     private LocalDateTime endTime;
+
+    public Epic() {
+        super();
+    }
 
     public Epic(String name, Status status, String description) {
         super(name, status, description);
@@ -18,26 +23,7 @@ public class Epic extends Task {
     public Epic(String name, Status status, String description, LocalDateTime startTime, Duration duration) {
         super(name, status, description, startTime, duration);
         super.startTime = null;
-        super.duration = null;
-    }
-
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
-
-        Epic epic = (Epic) o;
-
-        return Objects.equals(subTasksId, epic.subTasksId);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = super.hashCode();
-        result = 31 * result + (subTasksId != null ? subTasksId.hashCode() : 0);
-        return result;
+        super.duration = Duration.ZERO;
     }
 
     public void setEndTime(LocalDateTime endTime) {
@@ -63,14 +49,36 @@ public class Epic extends Task {
     }
 
     @Override
-    public String toString() {
-        return "Epic{" +
-                "id=" + getId() +
-                ", name='" + getName() + '\'' +
-                ", status='" + getStatus() + '\'' +
-                ", description='" + getDescription() + '\'' +
-                ", subTasksId='" + subTasksId + '\'' +
-                '}';
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
+        Epic epic = (Epic) o;
+
+        if (!subTasksId.equals(epic.subTasksId)) return false;
+        return Objects.equals(endTime, epic.endTime);
     }
 
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + subTasksId.hashCode();
+        result = 31 * result + (endTime != null ? endTime.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "Epic{" +
+                "subTasksId=" + subTasksId +
+                ", endTime=" + endTime +
+                ", id=" + id +
+                ", name='" + name + '\'' +
+                ", status=" + status +
+                ", description='" + description + '\'' +
+                ", duration=" + duration +
+                ", startTime=" + startTime +
+                '}';
+    }
 }
